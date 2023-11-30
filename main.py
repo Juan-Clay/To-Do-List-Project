@@ -26,7 +26,7 @@ class ToDoList:
 
     #Add specified item, items should be in order of priority, 1 being the most important, no repeated values
     def addItem(self, nm, pri, desc, due):
-        new_item = Item(nm, pri, desc, due)
+        new_item = Item(nm, int(pri), desc, due)
 
         #If the list is empty
         if(self.header.next == None):
@@ -86,38 +86,57 @@ class ToDoList:
 
     def printList(self):
         if self.header == None:
-            raise Exception("The list is empty")
+            print("The list is empty")
         else:
             tNode = self.header.next
             while(tNode != None):
-                print(tNode.priority)
+                print("Title: " + tNode.name)
+                print("Priority: " + str(tNode.priority))
+                print("Description: " + tNode.description)
+                print("Due date: " + tNode.dueBy)
                 tNode = tNode.next
         return
 
 
 def main():
-    to_do_list = ToDoList
+    to_do_list = ToDoList()
+    print("\n" * 100)
 
     while(True):
-        print("\n\n\n\n\n\n\n\n\n\n")
         answer = input("What would you like to do?\nAdd Item: A\nRemove Item: R\nPrint list: P\nClose out of program: C\nEnter response: ")
         if(answer == 'A'):
+            print("\n" * 100)
             nm = input("Enter the name of the item: ")
             pri = input("Enter the priority of the item: ")
+            #Input validation for priority
+            while(True):
+                if not pri.isnumeric():
+                    pri = input("Not a number, please enter a number greater that 0: ")
+                elif int(pri) < 1:
+                    pri = input("Please enter a number greater that 0: ")
+                else:
+                    break
+
             desc = input("Enter a decription of the item: ")
             due = input("Enter the due date of the item: ")
             to_do_list.addItem(nm, pri, desc, due)
+            print("\n" * 100)
 
         elif(answer == 'R'):
+            print("\n" * 100)
             nm = input("Enter the name of the item you want to remove: ")
             to_do_list.removeItem(nm)
+            print("\n" * 100)
             
         elif(answer == 'P'):
+            print("\n" * 100)
             to_do_list.printList()
         elif(answer == 'C'):
             break
         else:
-            raise Exception("That is not a valid command: ")
+            print("\n" * 100)
+            print("That is not a valid command, please try again")
+            print("\n\n")
     return 
     
 
