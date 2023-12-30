@@ -21,8 +21,11 @@ class ToDoList:
 
     #Initialize list by creating header node, header node will not be an actual Item in the list
     def __init__(self):
-        self.header = Item()
-        self.trailer = Item()
+        self.header = Item("head")
+        self.trailer = Item("tail")
+
+        self.header.next = self.trailer
+        self.trailer.prev = self.header
 
     #Add specified item, items should be in order of priority, 1 being the most important, no repeated values
     def addItem(self, nm, pri, desc, due):
@@ -37,11 +40,10 @@ class ToDoList:
             new_item.next = self.trailer
         #If the list is not empty, Look for where the item will go, check every item in the list if the priority value already exists
         else:
-            #Will iterate through the list
+            #Will iterate through the list, starts at first node that is not the header
             tNode = self.header.next
 
-            while(tNode != None):
-
+            while True:
                 if tNode.priority >= new_item.priority:
                     #Add new node before current node
                     new_item.prev = tNode.prev
@@ -50,7 +52,11 @@ class ToDoList:
                     new_item.next = tNode
                     return
                 else:
-                    tNode = tNode.next
+                    if tNode.next == None:
+                        break
+                    else:
+                        tNode = tNode.next
+            
             #If it reaches this point, the node goes at the end
             tNode.prev.next = new_item
             new_item.prev = tNode.prev
@@ -62,7 +68,7 @@ class ToDoList:
     #Remove specified item
     def removeItem(self, item_nm):
         if self.header == None:
-            raise Exception("The list is empty")
+            print("The list is empty\n\n")
         else:
             tNode = self.header.next
             while(tNode != None):
@@ -70,10 +76,9 @@ class ToDoList:
                     tNode.prev.next = tNode.next
                     tNode.next.prev = tNode.prev
                     del tNode
-
                     return
                 tNode = tNode.next
-            raise Exception("Name was not found in the list")
+            print("Item was not found in the list\n\n")
         return
         
             
@@ -84,32 +89,57 @@ class ToDoList:
     def updateItem(self):
         pass
 
+
+
     def printList(self):
-        if self.header == None:
-            print("The list is empty")
+        if self.header.next == None or self.header.next.next == None:
+            print("The list is empty\n\n")
+
         else:
             tNode = self.header.next
-            while(tNode != None):
+            while(tNode.next != None):
                 print("Title: " + tNode.name)
                 print("Priority: " + str(tNode.priority))
-                print("Description: " + tNode.description)
-                print("Due date: " + tNode.dueBy)
+
+                #For desc and due date, if they are empty it does not print out the linea
+                if tNode.description != '':
+                    print("Description: " + tNode.description)
+
+                if tNode.dueBy != '':
+                    print("Due date: " + tNode.dueBy)
+                print("\n\n")
+
                 tNode = tNode.next
+            print("\n\n")
         return
 
 
 def main():
+    #Creating the main list object and making a newline of 100 to clear the screen (Im lazy)
     to_do_list = ToDoList()
     print("\n" * 100)
 
+    #Main loop of asking questions
     while(True):
+        #asking all possible actions, and making the answer uppercase
         answer = input("What would you like to do?\nAdd Item: A\nRemove Item: R\nPrint list: P\nClose out of program: C\nEnter response: ")
+        answer = answer.upper()
         if(answer == 'A'):
             print("\n" * 100)
+
+            #Name
             nm = input("Enter the name of the item: ")
+            #Input validation for name, must be non-empty
+            while True:
+                if nm == '':
+                    nm = input("Name must be non-empty, please try again")
+                else:
+                    break
+
+            #Priority
             pri = input("Enter the priority of the item: ")
             #Input validation for priority
-            while(True):
+            while True:
                 if not pri.isnumeric():
                     pri = input("Not a number, please enter a number greater that 0: ")
                 elif int(pri) < 1:
@@ -117,6 +147,7 @@ def main():
                 else:
                     break
 
+            #Description and due date, both optional, can be empty
             desc = input("Enter a decription of the item: ")
             due = input("Enter the due date of the item: ")
             to_do_list.addItem(nm, pri, desc, due)
